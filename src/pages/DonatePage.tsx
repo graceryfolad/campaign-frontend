@@ -82,8 +82,8 @@ export default function DonatePage() {
   
   // State
   const [selectedAccount, setSelectedAccount] = useState<DesignatedAccount>(matchingAcc);
-  const [amount, setAmount] = useState<number>(
-    Number(searchParams.get('amount')) || (matchingAcc.currency === 'NGN' ? 25000 : 100)
+  const [amount, setAmount] = useState<number | ''>(
+    Number(searchParams.get('amount')) || ''
   );
   const [donorName, setDonorName] = useState<string>('');
   const [donorEmail, setDonorEmail] = useState<string>('');
@@ -97,15 +97,6 @@ export default function DonatePage() {
   // Success view state after clicking "I have paid"
   const [confirmedDonation, setConfirmedDonation] = useState<CreateDonationResponse | null>(null);
 
-  const defaultPresets: Record<string, number[]> = {
-    NGN: [5000, 10000, 25000, 50000, 100000, 500000],
-    USD: [25, 50, 100, 250, 500, 1000],
-    GBP: [20, 50, 100, 200, 500, 1000],
-    EUR: [25, 50, 100, 250, 500, 1000],
-  };
-
-  const currentPresets = defaultPresets[selectedAccount.currency] || defaultPresets.NGN;
-
   const handleCopy = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
     setCopiedKey(key);
@@ -114,8 +105,6 @@ export default function DonatePage() {
 
   const handleAccountSelect = (acc: DesignatedAccount) => {
     setSelectedAccount(acc);
-    const presets = defaultPresets[acc.currency] || defaultPresets.NGN;
-    setAmount(presets[2] || presets[0]);
   };
 
   const formatAmount = (val: number, curr: string) => {
@@ -130,7 +119,7 @@ export default function DonatePage() {
   const handleIHavePaid = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!amount || amount < 1) {
+    if (!amount || Number(amount) < 1) {
       setErrorMessage('Please specify the amount you transferred.');
       return;
     }
@@ -489,28 +478,10 @@ export default function DonatePage() {
 
         <form onSubmit={handleIHavePaid} className="space-y-6">
           {/* Amount Selection */}
-          <div className="space-y-3">
+          <div className="space-y-2">
             <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-              Amount Transferred ({selectedAccount.currency})
+              Amount Transferred ({selectedAccount.currency}) *
             </label>
-
-            {/* Presets */}
-            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-              {currentPresets.map((preset) => (
-                <button
-                  key={preset}
-                  type="button"
-                  onClick={() => setAmount(preset)}
-                  className={`py-2 px-1 text-xs font-bold rounded-xl transition-all ${
-                    amount === preset
-                      ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/20 ring-2 ring-emerald-500'
-                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
-                  }`}
-                >
-                  {formatAmount(preset, selectedAccount.currency)}
-                </button>
-              ))}
-            </div>
 
             {/* Custom Amount input */}
             <div className="relative">
@@ -521,9 +492,9 @@ export default function DonatePage() {
                 type="number"
                 min="1"
                 step="any"
-                value={amount || ''}
-                onChange={(e) => setAmount(Number(e.target.value))}
-                placeholder="Or enter custom amount transferred"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value === '' ? '' : Number(e.target.value))}
+                placeholder="Enter exact amount transferred"
                 className="w-full pl-10 pr-4 py-3.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 font-bold text-base focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
                 required
               />
@@ -603,7 +574,9 @@ export default function DonatePage() {
             ) : (
               <>
                 <CheckCircle2 className="w-6 h-6 text-slate-950" />
-                <span>I have paid ({formatAmount(amount, selectedAccount.currency)})</span>
+                <span>
+                  I have paid{amount && Number(amount) > 0 ? ` (${formatAmount(Number(amount), selectedAccount.currency)})` : ''}
+                </span>
               </>
             )}
           </button>

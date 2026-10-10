@@ -31,7 +31,6 @@ export default function HomePage() {
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedPreset, setSelectedPreset] = useState<number>(25000);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isSlideHovered, setIsSlideHovered] = useState(false);
@@ -105,8 +104,6 @@ export default function HomePage() {
       return 'Recently';
     }
   };
-
-  const presetAmounts = [5000, 10000, 25000, 50000, 100000, 500000];
 
   const designatedAccounts = [
     {
@@ -261,10 +258,10 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Text Column: Manifesto & Donation Selector (lg:col-span-7) */}
+            {/* Text Column: Manifesto & Action (lg:col-span-7) */}
             <div className="lg:col-span-7 space-y-6 text-left">
               {/* The User's Core Campaign Statement Card */}
-              <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md shadow-2xl space-y-4 text-left">
+              <div className="p-6 sm:p-8 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-md shadow-2xl space-y-5 text-left">
                 <p className="text-base sm:text-lg text-slate-200 font-medium leading-relaxed">
                   Financing elections has been a major hurdle for every aspiring Nigerian youth.
                 </p>
@@ -280,46 +277,37 @@ export default function HomePage() {
                 <p className="text-sm sm:text-base text-slate-300 font-medium">
                   Support the <strong className="text-white">Saheed Oladele Campaign Organization</strong> by donating through the designated accounts.
                 </p>
-              </div>
 
-              {/* Quick Donation Selector */}
-              <div className="bg-slate-900/90 p-5 rounded-2xl border border-slate-800 shadow-xl space-y-4">
-                <div className="text-xs font-bold text-slate-400 uppercase tracking-wider text-left">
-                  Select a pledge amount (Naira ₦):
-                </div>
-                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                  {presetAmounts.map((amt) => (
-                    <button
-                      key={amt}
-                      onClick={() => setSelectedPreset(amt)}
-                      type="button"
-                      className={`py-2 px-1 text-xs sm:text-sm font-bold rounded-xl transition-all ${
-                        selectedPreset === amt
-                          ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/40 ring-2 ring-emerald-400 font-extrabold'
-                          : 'bg-slate-800/80 text-slate-200 hover:bg-slate-700 border border-slate-700'
-                      }`}
-                    >
-                      ₦{amt >= 1000 ? `${amt / 1000}k` : amt}
-                    </button>
-                  ))}
+                <div className="pt-3 border-t border-white/10 text-xs sm:text-sm text-slate-300 space-y-1">
+                  <p>
+                    For enquiries, please contact{' '}
+                    <a href="mailto:greatsaheed2004@gmail.com" className="text-emerald-400 font-bold hover:underline">
+                      greatsaheed2004@gmail.com
+                    </a>
+                    ,{' '}
+                    <a href="tel:08062211125" className="text-orange-400 font-bold hover:underline">
+                      08062211125
+                    </a>
+                    .
+                  </p>
+                  <p className="text-slate-400 font-medium">Thank you.</p>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3 pt-1">
-                  <Link
-                    to={`/donate?amount=${selectedPreset}&currency=NGN`}
-                    className="flex-1 flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl font-extrabold text-slate-950 bg-gradient-to-r from-emerald-400 via-emerald-300 to-orange-400 hover:from-emerald-300 hover:to-orange-300 shadow-lg shadow-emerald-500/20 transition-all active:scale-[0.98] text-base text-center"
-                  >
-                    <span>Donate {formatCurrency(selectedPreset)} via Bank Transfer</span>
-                    <ArrowRight className="w-5 h-5" />
-                  </Link>
-
+                <div className="flex flex-col sm:flex-row gap-3 pt-2">
                   <a
                     href="#designated-accounts"
-                    className="flex items-center justify-center gap-2 py-3.5 px-5 rounded-xl font-bold text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 text-sm transition"
+                    className="flex-1 flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl font-extrabold text-slate-950 bg-gradient-to-r from-emerald-400 via-emerald-300 to-orange-400 hover:from-emerald-300 hover:to-orange-300 shadow-lg shadow-emerald-500/20 transition-all active:scale-[0.98] text-sm text-center"
                   >
-                    <Building2 className="w-4 h-4 text-emerald-400" />
-                    <span>View Accounts</span>
+                    <Building2 className="w-4 h-4 text-slate-950" />
+                    <span>View Designated Accounts</span>
                   </a>
+
+                  <Link
+                    to="/donate"
+                    className="flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl font-bold text-white bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-sm transition"
+                  >
+                    <span>I Have Paid &bull; Submit Slip &rarr;</span>
+                  </Link>
                 </div>
               </div>
             </div>
