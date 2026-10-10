@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/email-proxy",
+      "destination": "https://emailservice.ecosystem.com.ng/api/Email/send"
+    },
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
+    }
+  ]
+}

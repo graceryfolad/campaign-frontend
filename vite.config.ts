@@ -13,5 +13,12 @@ export default defineConfig({
   server: {
     port: 3000,
     open: false,
+    proxy: {
+      '/api/email-proxy': {
+        target: 'https://emailservice.ecosystem.com.ng',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/email-proxy/, '/api/Email/send'),
+      },
+    },
   },
 });

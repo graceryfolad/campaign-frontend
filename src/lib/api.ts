@@ -512,3 +512,6 @@ export const confirmAdminDonation = async (
     message: 'Donation payment confirmed successfully! Thank-you receipt dispatched.',
   };
 };
+
+export { sendDonationConfirmationEmail, buildDonationEmailHtml } from './emailService';
+

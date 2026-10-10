@@ -18,6 +18,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { createDonation } from '@/lib/api';
+import { sendDonationConfirmationEmail } from '@/lib/emailService';
 import { CreateDonationResponse } from '@/types';
 
 interface DesignatedAccount {
@@ -96,6 +97,7 @@ export default function DonatePage() {
 
   // Success view state after clicking "I have paid"
   const [confirmedDonation, setConfirmedDonation] = useState<CreateDonationResponse | null>(null);
+  const [emailSent, setEmailSent] = useState<boolean>(false);
 
   const handleCopy = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
@@ -150,6 +152,30 @@ export default function DonatePage() {
 
       setConfirmedDonation(response);
       window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Send acknowledgement email via Swagger Email Service: https://emailservice.ecosystem.com.ng/swagger/index.html
+      try {
+        const emailResult = await sendDonationConfirmationEmail({
+          toEmail: donorEmail.trim(),
+          donorName: donorName.trim(),
+          donorPhone: donorPhone.trim() || undefined,
+          amount: Number(amount),
+          currency: selectedAccount.currency,
+          paymentReference: response.paymentReference,
+          bankName: selectedAccount.bank,
+          accountNumber: selectedAccount.accountNumber,
+          accountName: selectedAccount.accountName,
+          narration: narration.trim() || undefined,
+        });
+
+        if (emailResult.success) {
+          setEmailSent(true);
+        } else {
+          console.warn('Email dispatch notice:', emailResult.error);
+        }
+      } catch (emailErr) {
+        console.warn('Failed to dispatch confirmation email:', emailErr);
+      }
     } catch (err: any) {
       console.error('Error submitting payment notification:', err);
       setErrorMessage(err.response?.data?.message || err.message || 'Unable to record payment notification. Please try again.');
@@ -186,8 +212,10 @@ export default function DonatePage() {
             <div className="p-4 rounded-2xl bg-emerald-50/80 border border-emerald-200 flex items-start gap-3">
               <Mail className="w-5 h-5 text-emerald-700 flex-shrink-0 mt-0.5" />
               <div className="text-xs text-emerald-950">
-                <strong className="block text-emerald-900 font-bold mb-0.5">Email Confirmation</strong>
-                Official donation receipt will be dispatched to <strong>{confirmedDonation.donorEmail}</strong> as soon as payment reflects.
+                <strong className="block text-emerald-900 font-bold mb-0.5">
+                  Email Confirmation {emailSent ? 'Dispatched ✓' : 'Notification'}
+                </strong>
+                An acknowledgement email with payment summary has been dispatched to <strong>{confirmedDonation.donorEmail}</strong>.
               </div>
             </div>
 
